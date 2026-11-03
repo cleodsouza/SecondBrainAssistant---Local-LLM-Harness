@@ -1,0 +1,328 @@
+# Track A - note processing. Input: the note body (+ its created date). Expected: a gold ProcessedNote.
+#
+# Labelling rules (keep these in the system prompt too, so the task is well-defined):
+#  - Relative dates are resolved against the note's `created` date
+#    ("by Friday", "Sunday", "end of November", "before the renewal on 31 Dec").
+#  - Vague ranges stay null: "this week", "next week", "in November", "first week of September", "sometime".
+#  - Action items include tasks for other people; prefix them with the owner ("Kabir: ...").
+#  - Ongoing habits/instructions from a professional (physio, doctor) count as action items, no due date.
+#  - Events that just happen (an installation date, a race) are not action items.
+#  - Entities = named people, projects, products, books, organisations and places. Not generic nouns.
+#  - Title/summary are free text and graded by rubric; everything else is graded objectively.
+
+- id: a001
+  note_id: n001
+  difficulty: easy
+  expected:
+    title: Kestrel project kickoff
+    note_type: meeting
+    tags: [work, design]
+    summary: Kickoff for Kestrel, an onboarding redesign aiming to improve the 41% signup completion rate, with an Oct 15 launch target. Roles were split between Zoya (metrics), Kabir (feasibility) and Aarav (flows).
+    action_items:
+      - {description: Audit current onboarding flow and do competitor teardown, due: 2026-07-10, priority: high}
+      - {description: "Kabir: check feasibility of DigiLocker integration", due: null, priority: medium}
+    entities: [Kestrel, Meera, Kabir, Zoya, DigiLocker]
+
+- id: a002
+  note_id: n003
+  difficulty: easy
+  expected:
+    title: Life admin to-dos
+    note_type: todo
+    tags: [admin, home]
+    summary: Personal admin list covering bike insurance renewal, a credit card payment and a complaint call about slow internet.
+    action_items:
+      - {description: Renew bike insurance, due: 2026-07-15, priority: high}
+      - {description: Pay credit card bill, due: null, priority: medium}
+      - {description: Call Hathway about slow internet, due: null, priority: medium}
+    entities: [Hathway]
+
+- id: a003
+  note_id: n008
+  difficulty: medium
+  expected:
+    title: Kestrel design review - 3-step flow chosen
+    note_type: meeting
+    tags: [work, design]
+    summary: The team chose a 3-step onboarding flow (phone + OTP, PAN + DigiLocker consent, app PIN) over the 5-step option. A motion prototype is due by July 31.
+    action_items:
+      - {description: Build motion prototype of the full flow, due: 2026-07-31, priority: high}
+      - {description: "Zoya: define funnel events for each step", due: null, priority: medium}
+    entities: [Kestrel, Kabir, Meera, Zoya, DigiLocker]
+
+- id: a004
+  note_id: n010
+  difficulty: hard
+  expected:
+    title: App idea - auto-detected expense splitting for flatmates
+    note_type: idea
+    tags: [side-project, finance]
+    summary: An idea for a flatmate expense-splitting app that auto-detects expenses from UPI messages, like Splitwise without manual entry. A prototype might be built on some weekend.
+    action_items:
+      - {description: Build a weekend prototype of the expense-split app, due: null, priority: low}
+    entities: [Splitwise, UPI]
+
+- id: a005
+  note_id: n011
+  difficulty: easy
+  expected:
+    title: Tanvi's engagement
+    note_type: journal
+    tags: [family, events]
+    summary: Tanvi got engaged to Siddharth, celebrated over a family video call. The wedding will likely be in February in Nashik.
+    action_items: []
+    entities: [Tanvi, Siddharth, Nashik]
+
+- id: a006
+  note_id: n014
+  difficulty: medium
+  expected:
+    title: 1:1 with Meera - Design Lead path
+    note_type: meeting
+    tags: [work, career]
+    summary: Meera said Aarav could be considered for Design Lead in the January review cycle if Kestrel succeeds. He needs to document impact and start mentoring the intern Pooja.
+    action_items:
+      - {description: Start documenting impact of work, due: null, priority: high}
+      - {description: Mentor design intern Pooja, due: null, priority: medium}
+    entities: [Meera, Kestrel, Pooja]
+
+- id: a007
+  note_id: n015
+  difficulty: medium
+  expected:
+    title: Switching to new tax regime
+    note_type: reference
+    tags: [finance]
+    summary: Aarav is moving to the new tax regime, so he will stop fresh ELSS investments while keeping existing units. The emergency fund is at 1.5 lakh against a 3 lakh target.
+    action_items:
+      - {description: Stop fresh ELSS investments, due: null, priority: medium}
+    entities: [ELSS]
+
+- id: a008
+  note_id: n017
+  difficulty: hard
+  expected:
+    title: Errands and reminders
+    note_type: todo
+    tags: [admin, home, friends]
+    summary: A shorthand errand list covering a foam roller, Ishita's birthday gift, a leaking bathroom tap and an Amazon return.
+    action_items:
+      - {description: Buy foam roller, due: null, priority: medium}
+      - {description: Buy birthday gift for Ishita, due: 2026-08-20, priority: high}
+      - {description: Call plumber about leaking bathroom tap, due: 2026-08-15, priority: medium}
+      - {description: Return Amazon parcel, due: 2026-08-16, priority: high}
+    entities: [Ishita, Amazon]
+
+- id: a009
+  note_id: n018
+  difficulty: easy
+  expected:
+    title: Independence Day long run
+    note_type: journal
+    tags: [fitness]
+    summary: A 10 km Independence Day run on the Bandra promenade at 7:05/km, followed by a relaxed day.
+    action_items: []
+    entities: [Bandra]
+
+- id: a010
+  note_id: n021
+  difficulty: medium
+  expected:
+    title: Kestrel usability test round 1
+    note_type: meeting
+    tags: [work, design]
+    summary: In round 1 testing, 5 of 8 participants were confused by the "PAN" label and 2 could not find "resend OTP", though DigiLocker auto-fill was liked. The label will be renamed to "PAN card (tax ID)".
+    action_items:
+      - {description: Fix the PAN and OTP copy, due: 2026-08-28, priority: high}
+      - {description: "Zoya: schedule usability test round 2", due: null, priority: medium}
+    entities: [Kestrel, Zoya, DigiLocker]
+
+- id: a011
+  note_id: n022
+  difficulty: easy
+  expected:
+    title: Weekly review ritual
+    note_type: idea
+    tags: [productivity]
+    summary: An idea for a 20-minute Sunday weekly review covering what went well, what didn't, and the top 3 priorities. It would be kept as a reusable template note.
+    action_items: []
+    entities: []
+
+- id: a012
+  note_id: n024
+  difficulty: medium
+  expected:
+    title: Switching internet to Airtel fiber
+    note_type: todo
+    tags: [home, admin]
+    summary: Aarav is switching from Hathway to Airtel Xstream fiber on a 300 Mbps plan at Rs 999/month, installed on Sept 5. Hathway should be cancelled only after the new line works.
+    action_items:
+      - {description: Cancel Hathway after Airtel connection is working, due: null, priority: medium}
+    entities: [Hathway, Airtel Xstream]
+
+- id: a013
+  note_id: n028
+  difficulty: medium
+  expected:
+    title: Physio diagnosis - IT band syndrome
+    note_type: reference
+    tags: [health, fitness]
+    summary: Dr. Neha Shah diagnosed IT band syndrome in the left knee, which is not structural. The plan is daily foam rolling and glute exercises with long runs capped at 12 km for two weeks.
+    action_items:
+      - {description: Foam roll daily, due: null, priority: high}
+      - {description: Do glute bridges and clamshells 3x15 daily, due: null, priority: high}
+      - {description: Cap long runs at 12 km for two weeks, due: null, priority: high}
+      - {description: Attend physio follow-up appointment, due: 2026-09-29, priority: medium}
+    entities: [Dr. Neha Shah]
+
+- id: a014
+  note_id: n029
+  difficulty: hard
+  expected:
+    title: Thinking in Systems - leverage points reflections
+    note_type: reading
+    tags: [reading, learning, work]
+    summary: Reflections on Meadows' leverage points, noting that structural changes beat parameter tweaks. Aarav applies this to Kestrel, his knee injury, investing and making his career impact visible.
+    action_items: []
+    entities: [Thinking in Systems, Meadows, Kestrel, DigiLocker]
+
+- id: a015
+  note_id: n030
+  difficulty: hard
+  expected:
+    title: November trip planning with Rohan and Ishita
+    note_type: todo
+    tags: [travel, friends]
+    summary: Rohan proposed a November trip after Diwali with Ishita and Aarav, choosing between Lonavala and Mulshi. Nobody wants to drive more than 3 hours.
+    action_items:
+      - {description: Decide trip destination between Lonavala and Mulshi, due: null, priority: medium}
+    entities: [Rohan, Ishita, Lonavala, Mulshi]
+
+- id: a016
+  note_id: n033
+  difficulty: medium
+  expected:
+    title: Kestrel launch moved to Nov 5
+    note_type: meeting
+    tags: [work]
+    summary: The Kestrel launch moved from Oct 15 to Nov 5 because of a delayed DigiLocker certification. It launches on Android only, with iOS following in December.
+    action_items:
+      - {description: Update the launch comms deck, due: 2026-10-02, priority: high}
+      - {description: "Kabir: answer the DigiLocker security questionnaire", due: null, priority: high}
+    entities: [Kestrel, DigiLocker, Kabir]
+
+- id: a017
+  note_id: n036
+  difficulty: medium
+  expected:
+    title: streak CLI progress
+    note_type: todo
+    tags: [side-project, engineering, learning]
+    summary: The add and list commands of the streak Rust CLI now save to SQLite, but a borrow-checker issue with returning Vec<&Habit> remains. The goal is to publish v0.1 on crates.io by end of November.
+    action_items:
+      - {description: Fix borrow checker issue by returning owned Habits, due: null, priority: medium}
+      - {description: Publish streak v0.1 on crates.io, due: 2026-11-30, priority: medium}
+    entities: [streak, SQLite, crates.io]
+
+- id: a018
+  note_id: n037
+  difficulty: medium
+  expected:
+    title: Mulshi trip decided
+    note_type: todo
+    tags: [travel, friends]
+    summary: The trip with Rohan and Ishita is set for Mulshi on Nov 13-15 at Green Ridge homestay, with a budget of about Rs 6,000 per person. Lonavala was ruled out as too crowded.
+    action_items:
+      - {description: Book Green Ridge homestay, due: 2026-10-10, priority: high}
+      - {description: "Ishita: make the food plan", due: null, priority: medium}
+    entities: [Rohan, Ishita, Mulshi, Lonavala, Green Ridge]
+
+- id: a019
+  note_id: n039
+  difficulty: medium
+  expected:
+    title: Wedding invitation concepts
+    note_type: idea
+    tags: [family, design, events]
+    summary: Three invitation concepts were drafted (marigold, minimal, Warli art), and Tanvi prefers Warli. The printer needs final files by Nov 30.
+    action_items:
+      - {description: Send final invitation files to printer, due: 2026-11-30, priority: high}
+      - {description: Confirm Marathi spellings of Siddharth's family names, due: null, priority: medium}
+    entities: [Tanvi, Siddharth]
+
+- id: a020
+  note_id: n042
+  difficulty: hard
+  expected:
+    title: Rent increase and repainting
+    note_type: todo
+    tags: [home, finance]
+    summary: Mr. Desai is raising rent by 5% from January, with the lease renewal due Dec 31. He will pay half of a repaint if Aarav arranges the painter.
+    action_items:
+      - {description: Get two painter quotes, due: 2026-12-31, priority: medium}
+    entities: [Mr. Desai]
+
+- id: a021
+  note_id: n044
+  difficulty: medium
+  expected:
+    title: Kestrel launch readiness
+    note_type: meeting
+    tags: [work]
+    summary: DigiLocker certification was approved on Oct 14, and QA sign-off is planned for Oct 30. Remaining work is copy review, release notes and a staged 10% to 100% rollout plan.
+    action_items:
+      - {description: Final copy review of all screens, due: 2026-10-23, priority: high}
+      - {description: "Zoya: write release notes", due: null, priority: medium}
+      - {description: "Kabir: prepare 10% then 100% rollout plan", due: null, priority: medium}
+    entities: [Kestrel, DigiLocker, Zoya, Kabir]
+
+- id: a022
+  note_id: n047
+  difficulty: hard
+  expected:
+    title: Sangeet dance planning
+    note_type: journal
+    tags: [family, events, music]
+    summary: A group dance with cousins is planned for the sangeet, and Tanvi wants a 90s Bollywood song that hasn't been chosen yet. Aarav feels stretched between work, the wedding and training.
+    action_items:
+      - {description: Make a song shortlist for the sangeet dance, due: 2026-10-25, priority: medium}
+    entities: [Tanvi]
+
+- id: a023
+  note_id: n050
+  difficulty: medium
+  expected:
+    title: Diwali in Nashik
+    note_type: todo
+    tags: [family, travel]
+    summary: Aarav will be home in Nashik for Diwali on Nov 7-9. He needs to book train tickets by Sunday and buy gifts for family.
+    action_items:
+      - {description: Book train tickets to Nashik, due: 2026-10-25, priority: high}
+      - {description: "Buy Diwali gifts for mom, dad and Tanvi", due: null, priority: medium}
+    entities: [Nashik, Panchavati Express, Tanvi]
+
+- id: a024
+  note_id: n057
+  difficulty: medium
+  expected:
+    title: Checkup - low Vitamin D
+    note_type: reference
+    tags: [health]
+    summary: The annual checkup was normal except for low Vitamin D at 14 ng/mL. The doctor prescribed 60,000 IU weekly for 8 weeks, with a recheck in November.
+    action_items:
+      - {description: "Take 60,000 IU Vitamin D weekly for 8 weeks", due: null, priority: high}
+      - {description: Recheck Vitamin D blood test, due: null, priority: medium}
+    entities: []
+
+- id: a025
+  note_id: n060
+  difficulty: hard
+  expected:
+    title: Catch up with Kabir and Q1 OKRs
+    note_type: todo
+    tags: [work]
+    summary: Aarav plans to discuss the post-launch analytics dashboard with Kabir next week and to think about Q1 OKRs.
+    action_items:
+      - {description: Catch up with Kabir about post-launch analytics dashboard, due: null, priority: medium}
+      - {description: Think about Q1 OKRs, due: null, priority: low}
+    entities: [Kabir]

@@ -1,0 +1,13 @@
+{
+  "vector_store": "chromadb",
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "top_k": 4,
+  "chunking": "one note per chunk; notes > 200 words split on paragraphs",
+  "distance": "cosine",
+  "reranking": null,
+  "hybrid_search": false,
+  "n_notes": 60,
+  "n_chunks": 61,
+  "recall@4_answerable": 0.95,
+  "frozen_file_sha256_12": "8b098c8ed61a"
+}

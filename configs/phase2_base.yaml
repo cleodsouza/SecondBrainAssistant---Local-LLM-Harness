@@ -1,0 +1,29 @@
+# Phase 2 base config. The sweep scripts override temperature / enforcement / max_retries on the
+# command line, so ONE config covers every Phase 2 run and nothing else can drift between runs.
+# Server (same as Phase 1):
+#   llama-bin/llama-server.exe -hf unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M -ngl 99 -c 8192 --port 8080 --seed 42
+name: phase2_qwen3-4b_q4km
+name_with_settings: true          # file names get _<enforcement>_t<temp>_r<retries>
+model_label: qwen3-4b-instruct-2507
+quant: Q4_K_M
+server: http://127.0.0.1:8080
+corpus_dir: second_brain_corpus/build
+tracks: [A, B]
+repeats: 3                        # 3 repeats per setting: enough to measure consistency at temp > 0
+warmup: 10                        # Phase 1 lesson: 3 warm-ups did not cover the GPU clock ramp-up
+order_seed: 1234
+
+enforcement: prompt_only          # prompt_only | json_object | json_schema
+max_retries: 1                    # validate -> one retry with the error message -> typed failure
+
+sampling:
+  temperature: 0.0
+  seed: 42
+  top_k: 40
+  top_p: 0.95
+  min_p: 0.05
+  repeat_penalty: 1.0
+  n_predict: 512
+
+extra_params: {}
+conditions: "plugged in, Best performance power mode, other apps (incl. Claude app) closed"

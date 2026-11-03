@@ -1,0 +1,4 @@
+track,ttft_ms_mean,ttft_ms_median,ttft_ms_p95,ttft_ms_std,latency_ms_mean,latency_ms_median,latency_ms_p95,latency_ms_std,prefill_tps_mean,prefill_tps_median,prefill_tps_p95,prefill_tps_std,decode_tps_mean,decode_tps_median,decode_tps_p95,decode_tps_std,prompt_n_mean,prompt_n_median,prompt_n_p95,prompt_n_std,predicted_n_mean,predicted_n_median,predicted_n_p95,predicted_n_std,n,json_parse_rate,hit_token_limit
+A,225.83,228.55,317.16,47.03,3014.73,2983.4,4080.72,668.72,2348.28,2323.26,2587.5,235.12,73.46,73.1,80.44,3.6,420.08,407.0,454.0,69.79,205.47,199.0,276.0,46.83,236,1.0,0.0
+B,318.92,300.69,444.85,69.94,1071.83,1051.05,1478.66,280.36,2411.22,2385.11,2570.35,220.69,70.87,71.21,77.8,4.7,576.12,559.0,683.0,60.84,54.15,54.0,82.0,18.1,240,1.0,0.0
+all,272.77,273.35,370.56,75.68,2035.12,1588.58,3870.2,1098.38,2380.01,2356.7,2572.36,229.89,72.15,72.51,80.26,4.38,498.76,518.0,683.0,101.84,129.18,93.0,268.0,83.58,476,1.0,0.0

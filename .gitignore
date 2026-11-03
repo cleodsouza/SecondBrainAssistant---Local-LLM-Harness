@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# llama.cpp binaries and model files (large, downloadable)
+llama-bin/
+*.gguf
+
+# Vector DB is rebuilt by second_brain_corpus/freeze_contexts.py
+second_brain_corpus/build/chroma/
+
+# Logs and throwaway runs
+*.log
+results/raw/smoke_tests/
+results/summary/*_smoke/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
