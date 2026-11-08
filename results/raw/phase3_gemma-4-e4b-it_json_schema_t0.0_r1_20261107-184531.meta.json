@@ -1,0 +1,65 @@
+{
+  "run_id": "phase3_gemma-4-e4b-it_json_schema_t0.0_r1_20261107-184531",
+  "config": {
+    "name": "phase3_gemma-4-e4b-it",
+    "name_with_settings": true,
+    "model_label": "gemma-4-e4b-it",
+    "quant": "Q4_K_M",
+    "server": "http://127.0.0.1:8080",
+    "corpus_dir": "second_brain_corpus/build",
+    "tracks": [
+      "A",
+      "B"
+    ],
+    "repeats": 3,
+    "warmup": 10,
+    "order_seed": 1234,
+    "enforcement": "json_schema",
+    "max_retries": 1,
+    "vary_seed_per_repeat": true,
+    "sampling": {
+      "temperature": 0.0,
+      "seed": 42,
+      "top_k": 40,
+      "top_p": 0.95,
+      "min_p": 0.05,
+      "repeat_penalty": 1.0,
+      "n_predict": 512
+    },
+    "extra_params": {},
+    "conditions": "plugged in, Best performance, Ollama + other GPU apps closed, server -np 1 -c 8192"
+  },
+  "repeats": 3,
+  "warmup": 10,
+  "effective": {
+    "temperature": 0.0,
+    "enforcement": "json_schema",
+    "max_retries": 1
+  },
+  "prompt_version": "v1",
+  "started": "2026-11-07T18:45:31",
+  "host": {
+    "platform": "Windows-10-10.0.26300-SP0",
+    "processor": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+    "python": "3.11.9",
+    "gpu_name": "NVIDIA GeForce RTX 3070 Ti Laptop GPU",
+    "driver": "581.08",
+    "gpu_memory_total": "8192 MiB"
+  },
+  "server_props": {
+    "model_path": "D:/models/gemma-4-E4B-it-Q4_K_M.gguf",
+    "build_info": "b11954-f1a7dea99",
+    "total_slots": 1,
+    "n_ctx": 8192
+  },
+  "sysmon": {
+    "vram_start_mib": 3444.0,
+    "vram_peak_mib": 3490.0,
+    "ram_peak_mib": 4146.7,
+    "gpu_util_mean": 75.1,
+    "sm_clock_busy_median_mhz": 780.0,
+    "gpu_temp_max_c": 80.0,
+    "gpu_power_busy_median_w": 70.74,
+    "n_samples": 594
+  }
+}

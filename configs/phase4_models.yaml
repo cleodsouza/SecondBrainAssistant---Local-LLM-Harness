@@ -1,0 +1,15 @@
+# Phase 4 - quantization study on Granite 4.1 3B (IBM). Same benchmark as Phase 3 (temperature 0, schema mode,
+# one retry, -np 1) but -c 4096 for every version so BF16 fits entirely in the 8 GB GPU. Files made by prepare_phase4.sh from the official BF16 weights.
+# `imatrix: true` = quantized with unsloth's importance matrix (calibration that protects the most important weights).
+models:
+  - {label: granite-BF16,        quant: BF16,   imatrix: false, source: original,   path: "D:/models/phase4/granite-4.1-3b-BF16.gguf"}
+  - {label: granite-Q8_0,        quant: Q8_0,   imatrix: false, source: ours,       path: "D:/models/phase4/granite-4.1-3b-Q8_0.gguf"}
+  - {label: granite-Q6_K,        quant: Q6_K,   imatrix: false, source: ours,       path: "D:/models/phase4/granite-4.1-3b-Q6_K.gguf"}
+  - {label: granite-Q5_K_M,      quant: Q5_K_M, imatrix: false, source: ours,       path: "D:/models/phase4/granite-4.1-3b-Q5_K_M.gguf"}
+  - {label: granite-Q4_K_M,      quant: Q4_K_M, imatrix: false, source: ours,       path: "D:/models/phase4/granite-4.1-3b-Q4_K_M.gguf"}
+  - {label: granite-Q3_K_M,      quant: Q3_K_M, imatrix: false, source: ours,       path: "D:/models/phase4/granite-4.1-3b-Q3_K_M.gguf"}
+  - {label: granite-Q2_K,        quant: Q2_K,   imatrix: false, source: ours,       path: "D:/models/phase4/granite-4.1-3b-Q2_K.gguf"}
+  - {label: granite-Q4_K_M-imat, quant: Q4_K_M, imatrix: true,  source: ours,       path: "D:/models/phase4/granite-4.1-3b-Q4_K_M-imat.gguf"}
+  - {label: granite-Q3_K_M-imat, quant: Q3_K_M, imatrix: true,  source: ours,       path: "D:/models/phase4/granite-4.1-3b-Q3_K_M-imat.gguf"}
+  - {label: granite-Q2_K-imat,   quant: Q2_K,   imatrix: true,  source: ours,       path: "D:/models/phase4/granite-4.1-3b-Q2_K-imat.gguf"}
+  - {label: granite-Q4_K_M-unsloth, quant: Q4_K_M, imatrix: unknown, source: unsloth, path: "D:/models/granite-4.1-3b-Q4_K_M.gguf"}

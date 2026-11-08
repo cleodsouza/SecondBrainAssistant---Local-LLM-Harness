@@ -115,6 +115,137 @@ Lessons carried forward
   (1 distinct output per item) -> the t0.7 runs are ONE sample each, not a variability measurement.
   Fixed: runner now uses seed = base + repeat (`vary_seed_per_repeat`, default true; seed stored per row).
   Temperature effects will be measured properly in step 2.5. Enforcement comparison at t0 is valid as-is.
+- **2.4 grader (2026-11-05):** `harness/grade.py` (+17 tests, 59 total). Usage:
+  `python harness/grade.py --label <x> <raw files>` -> results/graded/*.graded.jsonl + results/summary/quality_<x>/.
+  Track A: note_type, tags (Jaccard + precision/recall), action-item F1 (fuzzy match >= 0.5), due-date accuracy,
+  entity F1 (+P/R), invented_tasks; field_score = mean of 5. Track B: key-fact correctness, abstention,
+  hallucination, grounding; b017 (retrieval miss) expects abstention. Failed outputs score 0.
+  Quality results, temperature 0 (Qwen3-4B Q4_K_M):
+  | Setting | A valid | A field_score | A valid-only | B qa_score | B hallucination |
+  |---|---|---|---|---|---|
+  | prompt_only, no retry (Phase 1) | 48% | 34% | 70% | 96% | 0% |
+  | prompt_only + retry | 80% | 54% | 68% | 96% | 0% |
+  | json_object + retry | 80% | 54% | 68% | 96% | 0% |
+  | json_schema + retry | 100% | **65%** | 65% | 96% | 0% |
+  Paired check: on notes valid without enforcement, json_schema output is identical (no content cost);
+  gains come only from rescuing failures. Model weaknesses: over-tagging (tag precision ~51%, recall 88%),
+  over-extracting entities (precision ~51%, recall 99%), invented tasks on 8% of notes, note_type ambiguity
+  (journal/reference/todo). Track B: 96% correct, 100% abstention, 0% hallucination, 100% grounded;
+  only miss b019 (date arithmetic: said 14 days, correct 48). Track A synthetic accuracy is well below 90%
+  -> per the earlier decision, NO real-notes slice needed; use a scripted robustness set later if time allows.
+- **2.5 temperature sweep (built 2026-11-06):** `bash run_phase2_temperature.sh` = prompt_only & json_schema
+  interleaved at temps 0/0.2/0.4/0.6/0.7 (3 repeats, seeds 43-45) + side test at 0.7 with filters off
+  (`runner.py --no-filters` -> top_k 0, top_p 1, min_p 0; rows record sampling_filters/top_k/top_p/min_p).
+  12 runs, ~75 min. Analysis: `harness/analyze_temperature.py` -> results/summary/phase2_temperature/
+  (validity, quality via grader, hallucination, identical-output share, decision agreement, latency; 4 charts).
+- **2.5 temperature results (2026-11-06, 12 runs, 1,800 graded rows, seeds 43-45):**
+  | Mode | Temp | A first-try valid | A final valid | A quality | A decision agreement | A latency med | B quality / halluc. |
+  |---|---|---|---|---|---|---|---|
+  | prompt_only | 0.0 / 0.2 / 0.4 / 0.6 / 0.7 | 48 / 51 / 57 / 49 / 55% | 80-85% | 54-56% | 100 / 56 / 44 / 28 / 24% | 4.0-5.0 s | 96% / 0% |
+  | json_schema | 0.0 / 0.2 / 0.4 / 0.6 / 0.7 | 92 / 91 / 95 / 93 / 97% | 100% | 63-65% | 100 / 64 / 40 / 16 / 16% | 3.2-3.5 s | 96% / 0% |
+  Filters off at 0.7: almost no change (schema A agreement 20% vs 16%, prompt A first-try 52% vs 55%).
+  **Finding: temperature costs CONSISTENCY, not correctness.** Validity and mean quality are flat across
+  0-0.7 (errors are systematic, e.g. "admin" as note_type, not random). But the same note gets a different
+  decision on most re-runs at 0.6+. Driver = tags (tag-set agreement 100 -> 68 -> 40 -> 24 -> 24% in schema mode);
+  note_type agreement stays 88-100%, action-item count 88-96%. Track B is robust: decisions agree 100% at every
+  temperature (only wording varies: identical text 100 -> 60%), 96% correct and 0% hallucination throughout.
+  Recommendation: temperature 0 for extraction (reprocessing a note must give the same tags); Q&A tolerates 0.2-0.4.
+  Sampling filters add little protection here: the 4B model's distribution is already peaked.
+- Disk: C: was at 151 MB free on 2026-11-06 (device workspace failed to start). Moved Ollama models to
+  D:\ollama\models (OLLAMA_MODELS user env var) -> C: 13.3 GB free. All Phase 4 files go on D:.
+  `start_server.sh` starts llama-server with the pinned model (and closes Ollama).
+- **Phase 2 complete** except the write-up (2.6). Outline for the user: `reports/phase2_writeup_outline.md`.
+
+## Phase 3 (setup built 2026-11-06)
+- Line-up (decided 2026-11-07, configs/phase3_models.yaml), all Q4_K_M GGUF from unsloth:
+  | Model | Family | Released | Params | File |
+  |---|---|---|---|---|
+  | Qwen3-4B-Instruct-2507 | Alibaba | 2025-07 | 4.0B | 2.5 GB (C: HF cache) - Phase 1-2 anchor |
+  | Gemma 4 E4B-it | Google | 2026 | 4.5B effective / 8B with per-layer embeddings | 4.98 GB, D:/models |
+  | Granite 4.1 3B | IBM | 2026-04 | 3B dense | 2.1 GB, D:/models |
+  | Phi-4-mini-instruct | Microsoft | 2025-02 | 3.8B | 2.49 GB, D:/models - added 2026-11-07 at user's request |
+  (Phi: newest small general-purpose Phi; Phi-4-mini-reasoning variants excluded (long thinking); 2026 Phi is
+  Phi-4-reasoning-vision-15B, too big for 8 GB VRAM.)
+  Why: current families, ~3-4.5B effective, spread of memory footprints; Llama 3.2 3B (2024) and
+  Phi-4-mini (2025) dropped as older. Optional 4th if time: Qwen3.5-4B (Mar 2026; same family as the anchor,
+  multimodal, thinking must be off). Gemma 4 thinks only when <|think|> is in the system prompt (ours has none).
+  Download: `bash download_phase3_models.sh` (curl, resumable). Per-model `server_args` (--jinja) in the config.
+  Phase 4 idea: Granite 4.1 3B has an official BF16 GGUF (6.8 GB) -> F16 baseline without conversion, ~fits 8 GB.
+- `bash run_phase3.sh` (venv active, Ollama closed, no server running): 3 rounds x models (order rotated per round),
+  server restarted per model with `-np 1 -c 8192`, json_schema AND prompt_only, temperature 0, 1 retry,
+  `--repeat-index` = round (seed 42+round), `--sysmon` background sampler (nvidia-smi -lms 250 + psutil RSS).
+  Idle VRAM before each load -> results/raw/phase3_idle_vram.csv. ~70-90 min.
+- Safety (found in mock test): stop_server waits until port 8080 is free; start_server checks the process is alive
+  and /props model_path matches the expected file; runner aborts after 3 consecutive backend errors.
+- Windows gotchas fixed 2026-11-07: b11954 rejects `--jinja` (chat template is default; server_args now "");
+  Windows Python prints \r\n -> a stray \r became a bogus server argument -> all run scripts now `tr -d '\r'`.
+- Smoke test (4 Track A notes, 3 rounds, 2026-11-07) passed for all 4 models; 100% reproducible across restarts.
+  Early signals (n=4, not for quoting): Gemma decode ~52 tok/s vs 67-72 for others; Phi-4-mini wrote a 3-sentence
+  summary (a003) that grammar can't block AND returned the identical output on retry (ignores feedback at t0).
+  Gemma uses ~3.3 GB VRAM for a 5 GB file + 3.6 GB server RAM -> part of the model (likely per-layer embeddings)
+  stays in system RAM; report VRAM and RAM side by side. Server RAM ~ mmap'd file pages for all models.
+- **Phase 3 results (2026-11-07, Turbo mode, 24 runs, 1,200 graded rows; summary in results/summary/phase3_models/):**
+  | Model | VRAM / RAM (GB) | Decode tok/s | Out tok A | Latency A / B (s) | A valid 1st/final (schema) | A quality | B quality | Halluc. | Invented tasks |
+  |---|---|---|---|---|---|---|---|---|---|
+  | Gemma 4 E4B | 3.32 / 4.91 | 50.5 | 137 | 2.84 / 1.44 | 100 / 100% | **73%** | **96%** | 0% | 4% |
+  | Qwen3-4B-2507 | 3.71 / 5.25 | 64.1 | 202 | 3.38 / 1.18 | 92 / 100% | 65% | **96%** | 0% | 8% |
+  | Granite 4.1 3B | **2.85** / 3.60 | **71.0** | 157 | 2.40 / 0.89 | 84 / 88% | 58% | 92% | 0% | 0% |
+  | Phi-4-mini | 3.58 / 4.83 | 67.4 | 147 | 2.31 / 0.98 | 76 / 88% | 47% | 84% | **17%** | 12% |
+  Per field (schema; note_type / tags / actions F1 / due / entities): Gemma 76/46/89/83/72, Qwen 64/47/78/70/63,
+  Granite 56/41/73/64/54, Phi 52/41/60/33/47. Qwen matches Phase 2 exactly (65% / 96%) -> results reproducible.
+  Findings: Gemma best quality despite slowest decode (terse outputs -> lower latency than Qwen). Schema mode raises
+  first-try validity for every model (Gemma 56->100, Qwen 48->92, Granite 60->84, Phi 56->76) and quality for
+  Gemma (+15 pts) and Qwen (+11), not Granite/Phi. Residual schema-mode errors = summary > 2 sentences (+1
+  duplicate tags) - rules a grammar can't encode. Retry behaviour differs: Granite returned the IDENTICAL output
+  on 3 of 4 retries (stubborn at t0); Phi rewrote but still broke the rule. Only hallucination: Phi on b022
+  ("The Panchavati Express was booked") - the plan-vs-done trap. b019 date arithmetic failed by ALL four models.
+  100% reproducible across server restarts for every model. Sample note: 25 items per track, deterministic ->
+  a 4-point difference = 1 item; Gemma vs Qwen (8 pts) is meaningful, Granite vs Phi on Track B less so.
+- Analysis: `harness/analyze_phase3.py`
+
+## Phase 4 (setup built 2026-11-08)
+- Model: Granite 4.1 3B (official BF16 GGUF 6.81 GB fits 8 GB VRAM -> true unquantized baseline on GPU).
+- 11 versions (configs/phase4_models.yaml): BF16; ours plain Q8_0 Q6_K Q5_K_M Q4_K_M Q3_K_M Q2_K;
+  ours with unsloth's importance matrix (imatrix_unsloth.gguf) Q4_K_M Q3_K_M Q2_K; unsloth's own Q4_K_M.
+- `bash prepare_phase4.sh`: downloads BF16 + imatrix to D:/models/phase4, runs llama-quantize (temp .part files,
+  skips finished). ~26 GB on D:.
+- `bash run_phase4.sh`: reuses run_phase3.sh via env vars (MODELS_CFG, ROUNDS=2, MODES=json_schema, PREFIX=phase4,
+  ANALYZE=harness/analyze_phase4.py). ~60-75 min.
+- `bash run_phase4_kld.sh`: llama-perplexity KL divergence + same-top-token + PPL vs BF16 on the 60 notes
+  (results/raw/phase4_kld.csv via harness/parse_kld.py). Independent of our grader.
+- Quantization done 2026-11-08 (10 files in D:/models/phase4); quantize logs confirm imatrix variants loaded
+  280 entries from unsloth's own calibration text (not our notes -> no contamination); imatrix does not change
+  file size (Q2_K 1304.5 MiB / 3.22 bpw either way).
+- Smoke test (4 notes, 1 round): BF16 ran at 17 tok/s with SM clock 210 MHz at 97% util and 7.5 of 8 GB VRAM ->
+  Windows spilled to system RAM (earlier attempt at 16:16 reached 42 tok/s). Fix: Phase 4 uses -c 4096 for ALL
+  versions (CTX env var in run_phase3.sh; longest prompt+answer ~1.6k tokens). analyze_phase4 now warns when a
+  version's GPU clock is < 50% of the median (VRAM spill). Early signal (n=4, not for quoting): plain Q4_K_M lost
+  ~48 pts vs BF16 (summaries > 2 sentences, failed after retry) while imatrix Q4_K_M matched BF16 -> wait for
+  full run + KLD.
+- **Phase 4 results (2026-11-08 full run, 22 runs, 1,100 graded rows, -c 4096, no VRAM-spill warning):**
+  | Version | Size vs BF16 | VRAM GB | Decode tok/s | A quality | B quality | Halluc. | A failed after retry |
+  |---|---|---|---|---|---|---|---|
+  | BF16 | 100% | 6.90 | 40.9 | 61% | 92% | 0% | 8% |
+  | Q8_0 | 53% | 3.93 | 62.7 | 60% | 92% | 0% | 8% |
+  | Q6_K | 41% | 3.17 | 68.5 | 57% | 92% | 0% | 12% |
+  | Q5_K_M | 36% | 2.84 | 73.0 | 52% | 88% | 0% | 12% |
+  | Q4_K_M plain | 31% | 2.53 | 81.5 | 48% | 88% | 0% | 24% |
+  | Q4_K_M imatrix | 31% | 2.52 | 80.1 | 61% | 88% | 0% | 8% |
+  | Q4_K_M unsloth | 31% | 2.52 | 79.6 | 58% | 92% | 0% | 12% |
+  | Q3_K_M plain | 25% | 2.16 | 79.4 | 54% | 88% | 17% (b025) | 8% |
+  | Q3_K_M imatrix | 25% | 2.18 | 80.0 | 52% | 84% | 0% | 20% |
+  | Q2_K plain | 20% | 1.83 | 91.4 | 25% | 24% | 0% | 8% |
+  | Q2_K imatrix | 20% | 1.83 | 98.9 | 62% | 92% | 17% (b022) | 4% |
+  Findings: Q8/Q6 near-lossless (-2/-4 pts) at 1.5-1.7x speed; speed gains flatten below Q4 (2.0x -> 2.2-2.4x);
+  plain Q2_K COLLAPSED - on Track B it refused EVERY answerable question when valid (32% invalid), score only
+  from correct abstentions; imatrix fully rescues Q2_K (62% / 92% = BF16 level at 20% size, 2.4x speed) and
+  improves Q4_K_M (61 vs 48, plain fails the 2-sentence summary rule on 24% of notes). Hallucination appears only
+  at <= 4 bpw (one item each). Noise: 25 items/track, 4 pts = 1 item; trust only large effects; KLD (pending,
+  run 2026-11-09) is the tie-breaker for close calls (Q3 vs Q4, Q2-imat vs BF16).
+- `harness/analyze_phase4.py` -> results/summary/phase4_quant/: size, bits/weight, VRAM, speed-up, quality and
+  deltas vs BF16, KLD; charts quality/QA/speed vs size, KLD vs bpw, per-field heatmap. -> results/summary/phase3_models/ (speed, model/peak VRAM, validity,
+  quality, hallucination, invented tasks, reproducibility across restarts, efficiency per GB / per second,
+  per-field accuracy; 3 charts).
 - Run scripts now refuse to start outside the venv (the 2026-11-03 runs used system Python 3.9 -> the analysis
   step crashed on pandas/numpy; model outputs unaffected).
 - Working mode (agreed 2026-11-02): Claude writes code and explains it; after each piece the user does a short

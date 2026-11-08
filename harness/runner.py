@@ -41,6 +41,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from enforcement import MODES, enforcement_params  # noqa: E402
 from prompts import PROMPT_VERSION, track_a_messages, track_b_messages  # noqa: E402
 from structured import generate_structured  # noqa: E402
+from sysmon import SysMon  # noqa: E402
 from validate import NoteAnswer, ProcessedNote  # noqa: E402
 
 SCHEMAS = {"A": ProcessedNote, "B": NoteAnswer}
@@ -94,9 +95,8 @@ class LlamaServer:
                           f"giving up after {max_wait:.0f}s)...")
                     warned = True
             time.sleep(2)
-        sys.exit(f"llama-server at {self.base} did not respond. Start it first, e.g.\n"
-                 f"  ./llama-bin/llama-server.exe -hf unsloth/Qwen3-4B-Instruct-2507-GGUF:Q4_K_M "
-                 f"-ngl 99 -c 8192 --port 8080 --seed 42")
+        sys.exit(f"llama-server at {self.base} did not respond. In another Git Bash window, from "
+                 f"D:\\SLM Project, run:  bash start_server.sh")
 
     def props(self) -> dict:
         try:
@@ -177,10 +177,26 @@ def main() -> None:
     ap.add_argument("--temperature", type=float, help="override sampling.temperature")
     ap.add_argument("--enforcement", choices=MODES, help="override enforcement mode")
     ap.add_argument("--max-retries", type=int, help="override max_retries (0 = no retry)")
+    ap.add_argument("--model-label", help="override model_label (Phase 3: one config, many models)")
+    ap.add_argument("--quant", help="override quant label")
+    ap.add_argument("--name", help="override the experiment name")
+    ap.add_argument("--repeat-index", type=int,
+                    help="run exactly ONE repeat with this index (seed = base + index); used to interleave models")
+    ap.add_argument("--sysmon", action="store_true", help="sample VRAM / RAM / GPU in the background (Phase 3)")
+    ap.add_argument("--no-filters", action="store_true",
+                    help="disable top_k / top_p / min_p (pure temperature sampling) - Phase 2 side test")
     args = ap.parse_args()
 
     cfg = yaml.safe_load(open(args.config, encoding="utf-8"))
+    for key, val in (("model_label", args.model_label), ("quant", args.quant), ("name", args.name)):
+        if val:
+            cfg[key] = val
     sampling = dict(cfg["sampling"])
+    filters = "on"
+    if args.no_filters:
+        # top_k=0 and top_p=1.0 and min_p=0.0 switch each filter off in llama.cpp.
+        sampling.update({"top_k": 0, "top_p": 1.0, "min_p": 0.0})
+        filters = "off"
     if args.temperature is not None:
         sampling["temperature"] = args.temperature
     enforcement = args.enforcement or cfg.get("enforcement", "prompt_only")
@@ -200,6 +216,8 @@ def main() -> None:
     name = cfg["name"]
     if cfg.get("name_with_settings", False):
         name = f"{name}_{enforcement}_t{sampling['temperature']:.1f}_r{max_retries}"
+        if filters == "off":
+            name += "_nofilt"
     run_id = f"{name}_{datetime.now():%Y%m%d-%H%M%S}"
     out_dir = ROOT / "results" / "raw"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -220,7 +238,8 @@ def main() -> None:
     common = {"run_id": run_id, "experiment": cfg["name"], "model": cfg.get("model_label"),
               "quant": cfg.get("quant"), "prompt_version": PROMPT_VERSION,
               "temperature": sampling.get("temperature"), "seed": sampling.get("seed"),
-              "enforcement": enforcement, "max_retries": max_retries}
+              "enforcement": enforcement, "max_retries": max_retries, "sampling_filters": filters,
+              "top_k": sampling.get("top_k"), "top_p": sampling.get("top_p"), "min_p": sampling.get("min_p")}
 
     # Seed per repeat. With ONE fixed seed, every repeat replays the same "random" draws, so a
     # temperature > 0 run silently becomes a single sample repeated 3x (Phase 2 smoke-run finding).
@@ -252,14 +271,22 @@ def main() -> None:
     # Warm-up: first few items, results recorded but flagged and excluded from analysis.
     schedule = [(0, True, items[i % len(items)]) for i in range(warmup)]
     rng = random.Random(cfg.get("order_seed", 1234))
-    for rep in range(1, repeats + 1):
+    rep_indices = [args.repeat_index] if args.repeat_index else list(range(1, repeats + 1))
+    for rep in rep_indices:
         order = items[:]
-        rng.shuffle(order)
+        if args.repeat_index:      # single-repeat mode: order depends only on the repeat index
+            random.Random(cfg.get("order_seed", 1234) + rep).shuffle(order)
+        else:
+            rng.shuffle(order)
         schedule += [(rep, False, it) for it in order]
 
     total = len(schedule)
-    print(f"{run_id}: {len(items)} items x {repeats} repeats + {warmup} warm-up = {total} items")
+    print(f"{run_id}: {len(items)} items x {len(rep_indices)} repeat(s) + {warmup} warm-up = {total} items")
     print(f"  enforcement={enforcement}  temperature={sampling['temperature']}  max_retries={max_retries}")
+    mon = SysMon(out_dir / f"{run_id}.sysmon.csv") if args.sysmon else None
+    if mon:
+        mon.start()
+    consecutive_errors = 0
     with open(out_path, "w", encoding="utf-8") as f:
         for seq, (rep, is_warmup, it) in enumerate(schedule, 1):
             r = generate_structured(make_generate(it, rep), it["messages"], SCHEMAS[it["track"]],
@@ -296,7 +323,20 @@ def main() -> None:
                     "failed": f"FAILED ({last.error_type})"}[r.status]
             print(f"[{seq:>4}/{total}] {tag:<4} {it['item_id']}  ttft={ttft}ms  decode={dec} tok/s"
                   f"  out={row['predicted_n']}  {note}{'  ERROR ' + row['error'] if row['error'] else ''}")
+            consecutive_errors = consecutive_errors + 1 if row["error"] else 0
+            if consecutive_errors >= 3:
+                # The server is gone (crashed, killed, or never started). Stop instead of writing
+                # a whole run of failed rows that would silently pollute the results.
+                if mon:
+                    mon.stop()
+                sys.exit(f"\nABORTED: 3 consecutive backend errors - is llama-server still running?\n"
+                         f"Partial results kept in {out_path} (exclude them from analysis).")
 
+    if mon:
+        mon.stop()
+        meta["sysmon"] = mon.summary()
+        (out_dir / f"{run_id}.meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+        print(f"memory: {meta['sysmon']}")
     print(f"\nwrote {out_path}")
 
 

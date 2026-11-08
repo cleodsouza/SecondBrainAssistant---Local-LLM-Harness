@@ -16,6 +16,9 @@ second_brain_corpus/build/chroma/
 results/raw/smoke_tests/
 results/summary/*_smoke/
 
+# Private working notes
+PROJECT_LOG.md
+
 # OS / editor
 .DS_Store
 Thumbs.db

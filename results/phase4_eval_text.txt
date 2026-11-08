@@ -1,0 +1,292 @@
+Note n001 (2026-07-06):
+Kestrel kickoff w/ Meera, Kabir, Zoya. Goal: fix onboarding drop-off - right now only 41% of new users finish signup.
+Scope = signup + KYC flow, Android first, iOS later. Zoya owns metrics, Kabir owns feasibility, I own the flows.
+Launch target Oct 15.
+Me: audit the current flow + competitor teardown by Friday.
+Kabir: check if a DigiLocker integration is even possible.
+
+Note n002 (2026-07-08):
+Design of Everyday Things (Norman) - notes ch 1.
+Affordance = what an object lets you do. Signifier = the cue that tells you what to do. Most "bad UX" I see at work is
+missing signifiers, not missing affordances. Our "Verify" button on the KYC screen looks disabled even when it is
+active - classic signifier failure. Also: when users fail, they blame themselves, which is why nobody reports it.
+
+Note n003 (2026-07-09):
+life admin:
+- renew bike insurance before 15 July (expires that day!)
+- pay credit card bill
+- call Hathway AGAIN about slow internet
+
+Note n004 (2026-07-11):
+First week of Kestrel done. Feels good to own a project end to end for once. Haven't run in five days though and I
+can feel it. Thinking about signing up for a half marathon in December to force some consistency.
+
+Note n005 (2026-07-13):
+Idea: a weekly review template. Sunday evening, 20 min. Three sections - wins, misses, top 3 for next week.
+Could live as a pinned note. Maybe automate the prompt with a reminder.
+
+Note n006 (2026-07-15):
+Competitor teardown (signup + KYC):
+- Paywise: 7 steps, manual PAN + Aadhaar photo upload, ~6 min end to end.
+- Moneta: 4 steps, video KYC as the main path, long waits in the evenings.
+- Kosh: 3 steps, DigiLocker consent pulls documents automatically, ~2 min. Best of the three.
+Takeaway: fewer steps + DigiLocker is the pattern to beat.
+
+Note n007 (2026-07-18):
+Registered for the Navi Mumbai half marathon - race day is 13 Dec. Goal: finish under 2:10.
+Plan: 20-week build starting Monday 20 July, 4 runs/week (2 easy, 1 tempo, 1 long). Nikhil is doing it too.
+
+Note n008 (2026-07-20):
+Kestrel design review. Decision: go with the 3-step flow, not the 5-step one.
+Steps: (1) phone number + OTP, (2) PAN + DigiLocker consent, (3) set app PIN.
+Kabir is fine with it if DigiLocker works out. Meera wants a motion prototype of the full flow by 31 July.
+Zoya will define the funnel events so we can measure each step.
+
+Note n009 (2026-07-22):
+Thinking in Systems (Meadows), ch 1-2. Stocks and flows: a stock only changes through its inflows and outflows,
+so it lags. Our signup funnel is a stock of "half-registered users" - we keep adding inflow (ads) without fixing
+the outflow (abandonment). Balancing vs reinforcing loops - word of mouth is a reinforcing loop we're starving.
+
+Note n010 (2026-07-25):
+yaar ek app idea - flatmates ke beech ghar ka kharcha split karne ke liye, but UPI messages se auto-detect ho jaye.
+Splitwise jaisa but zero manual entry. Kabhi weekend pe prototype banaunga, abhi time nahi hai.
+
+Note n011 (2026-07-27):
+Tanvi got engaged to Siddharth!! Big family video call tonight, mom was crying happy tears.
+Wedding will probably be in February, in Nashik. I already know I'll be roped into the invitations.
+
+Note n012 (2026-07-29):
+Started learning Rust - The Rust Book ch 1-4. Ownership and borrowing are confusing: a value has one owner, you can
+have many immutable refs OR one mutable ref, never both. Feels strict but I get why. Goal: build something small
+instead of only reading.
+
+Note n013 (2026-08-02):
+Running reference:
+easy pace 7:15/km, tempo 6:10/km, long run 7:00-7:20/km.
+Race pace for sub-2:10 half = ~6:10/km.
+Shoes: daily trainer for easy days, keep the old pair for rain.
+
+Note n014 (2026-08-05):
+1:1 with Meera. Career stuff: she thinks I could be considered for Design Lead in the January review cycle if Kestrel
+lands well. I need to start documenting impact, not just shipping. She also wants me to mentor Pooja, the new design
+intern. Felt encouraging but also like the bar just moved.
+
+Note n015 (2026-08-08):
+Money decision: switching to the new tax regime this year. ELSS isn't needed for 80C anymore - keep the existing
+ELSS units, just stop fresh ELSS investments. Emergency fund is at 1.5 lakh, target is 3 lakh (about 6 months of expenses).
+
+Note n016 (2026-08-10):
+Kestrel sync. Kabir confirmed the DigiLocker API is feasible, so it replaces the manual document upload completely.
+Catch: we need certification from the DigiLocker partner team, which usually takes 4-6 weeks.
+Kabir to submit the application by 14 Aug. If certification slips, the launch date slips.
+
+Note n017 (2026-08-12):
+buy foam rollr
+bday gift for ishita - 20 aug!!
+bathroom tap leaking, call plumber sat
+return amzn parcel b4 window closes (sun)
+
+Note n018 (2026-08-15):
+Independence Day. Did a 10 km long run at 7:05/km along the Bandra promenade, flags everywhere, really nice
+atmosphere. Slept in after. Lazy day with the family on the phone. A good kind of tired.
+
+Note n019 (2026-08-18):
+Finished Deep Work (Newport). Main takeaway: shallow work expands to fill the day unless you schedule depth first.
+Going to try two 90-minute deep-work blocks a day, Slack closed, phone in another room. Mornings for design,
+afternoons for meetings.
+
+Note n020 (2026-08-21):
+Side project: "streak" - a tiny Rust CLI habit tracker.
+Commands: streak add <habit>, streak done <habit>, streak list.
+Stack: clap for argument parsing, serde for config, rusqlite for storage (SQLite file in ~/.streak).
+Good excuse to actually practise ownership stuff.
+
+Note n021 (2026-08-24):
+Kestrel usability test, round 1, 8 participants.
+- 5 of 8 got confused at the "PAN" step label - several didn't know PAN = their tax card. Rename it to "PAN card (tax ID)".
+- 2 of 8 couldn't find the "resend OTP" link.
+- Everyone liked the DigiLocker auto-fill once they got there.
+Me: fix the copy by 28 Aug. Zoya: schedule round 2 for the first week of September.
+
+Note n022 (2026-08-27):
+Idea!! weekly review every Sunday - 20 mins. What went well, what didn't, top 3 priorities for next week.
+Could keep it as a template note and duplicate it each week.
+
+Note n023 (2026-08-30):
+Tanvi's wedding date is fixed - 12 February 2027, in Nashik. I'm officially in charge of designing the invitations.
+Mom wants our side's guest list by 15 October.
+
+Note n024 (2026-09-02):
+Done with Hathway. Switching to Airtel Xstream fiber - 300 Mbps plan, Rs 999/month. Installation is on 5 Sept.
+Cancel Hathway only AFTER the new connection is working.
+
+Note n025 (2026-09-05):
+Guitar: working on the F barre chord. 15 minutes every day before work. Index finger keeps muting the G string.
+Watching a few YouTube lessons on thumb position.
+
+Note n026 (2026-09-08):
+Kestrel A/B results are in. New 3-step flow: 58% signup completion vs 41% for the old flow (control).
+~12,000 users over two weeks, significant. Biggest remaining drop-off is the DigiLocker consent screen.
+This is the number for my impact doc.
+
+Note n027 (2026-09-12):
+Left knee pain on the outer side after today's 14 km run. Had to walk the last km. Booked physio with Dr. Neha Shah
+for Tuesday. Skipping running till then.
+
+Note n028 (2026-09-15):
+Physio - Dr. Neha Shah. Diagnosis: IT band syndrome, left knee. Not structural, phew.
+Plan: foam roll daily, glute bridges + clamshells 3x15 every day, cap long runs at 12 km for two weeks.
+Follow-up appointment 29 Sept.
+
+Note n029 (2026-09-18):
+Finished Thinking in Systems (Meadows). Long note because I want to actually think about this.
+
+The leverage points chapter is the one that stuck. Her list goes roughly from weak to strong: numbers and parameters
+(subsidies, taxes, standards) are the least powerful even though they're where everyone spends their energy. Above
+that come buffers, stock-and-flow structures, delays, feedback loops, information flows, rules, the power to
+self-organise, goals, and at the top, the paradigm the system comes out of.
+
+Applying it to Kestrel: for months the team's answer to drop-off was parameter tweaks - change a button colour,
+shorten a label, add a progress bar. Those helped a little. The real jump came from changing the structure: cutting
+five steps to three and replacing manual uploads with DigiLocker. That's a stock-and-flow change, not a parameter.
+The next level up is information flow - users don't know why we need their PAN, so they hesitate. Telling them
+(a short "why we ask" line) might beat any further layout change.
+
+Applying it to running: my knee problem is a delay problem. I increased mileage, the body adapted slowly, and the
+damage showed up weeks after the decision that caused it. The fix isn't "run harder", it's respecting the delay -
+smaller weekly increases.
+
+Applying it to money: SIPs are a reinforcing loop. The rule "invest first, spend what's left" is a stronger
+leverage point than any individual budgeting decision.
+
+Applying it to my career: the goal of the system I'm in rewards shipping, but promotion rewards visible impact.
+If I don't change my own information flows - writing down outcomes - the work stays invisible.
+
+Not sure what to do with all of this yet. Mostly I want to remember that the obvious knobs are usually the weak ones.
+
+Note n030 (2026-09-20):
+Rohan called - wants a trip with Ishita and me sometime in November, after Diwali. Options: Lonavala or Mulshi.
+Need to decide soonish. Nobody wants to drive more than 3 hours.
+
+Note n031 (2026-09-23):
+Increasing my monthly SIP from 15,000 to 20,000 starting October. Emergency fund is now at 1.8 lakh,
+so 1.2 lakh more to hit the 3 lakh target.
+
+Note n032 (2026-09-25):
+Passport expires March 2027 - apply for renewal by end of October, before wedding chaos.
+Need: old passport, address proof, book the PSK appointment online.
+
+Note n033 (2026-09-28):
+Kestrel: launch moved from 15 Oct to 5 Nov. Reason: DigiLocker certification is delayed - partner team came back
+with extra security questions. Launch will be Android only; iOS follows in December.
+Me: update the launch comms deck by 2 Oct. Kabir: answer the security questionnaire this week.
+
+Note n034 (2026-09-29):
+Physio follow-up. Knee is much better. Allowed to rebuild the long run gradually - add max 2 km per week.
+Keep the glute work going through race day.
+
+Note n035 (2026-10-01):
+Bit anxious about the Kestrel delay, felt like it reflects on me even though it's a certification thing.
+Talked to Nikhil on our run, he said nobody remembers launch dates, they remember whether it worked. Fair.
+
+Note n036 (2026-10-03):
+streak progress: add + list work, data saves to SQLite. Stuck on the borrow checker when returning a Vec<&Habit>
+from a function that owns the connection. Probably need to return owned Habits instead.
+Goal: publish v0.1 on crates.io by end of November.
+
+Note n037 (2026-10-04):
+Trip decided with Rohan + Ishita: Mulshi, not Lonavala (Lonavala will be packed that weekend).
+Dates: 13-15 Nov. Staying at Green Ridge homestay. Budget ~Rs 6,000 per person all-in.
+Rohan drives his car. I book the homestay by 10 Oct. Ishita makes the food plan.
+
+Note n038 (2026-10-06):
+Mentoring Pooja - weekly 30-min check-in, Thursdays. She's designing empty states for the transactions screen.
+Her instincts are good; she under-explains her decisions. Next session: practise presenting rationale.
+
+Note n039 (2026-10-08):
+Wedding invitation drafts - 3 concepts: marigold (traditional, gold + orange), minimal (cream, serif type),
+Warli art (white line figures on terracotta). Tanvi loves the Warli one. Printer needs final files by 30 Nov.
+Need Siddharth's family's names spelled correctly in Marathi.
+
+Note n040 (2026-10-10):
+Booked Green Ridge for Mulshi. Paid Rs 4,500 advance, rest on arrival. Shared the booking screenshot in the group.
+
+Note n041 (2026-10-12):
+Rust Book ch 15 - smart pointers. Box<T> for heap allocation, Rc<T> for shared ownership (single thread),
+RefCell<T> for interior mutability checked at runtime. Rc<RefCell<T>> = shared + mutable. Might be overkill for streak.
+
+Note n042 (2026-10-14):
+Landlord (Mr. Desai) called. Rent goes up 5% from January; the lease renewal is due 31 Dec.
+Asked him about repainting - he'll pay half if I arrange the painter.
+Get two painter quotes before the renewal.
+
+Note n043 (2026-10-15):
+Sent mom our side's guest list for the wedding - about 60 people. Done on the deadline, for once.
+
+Note n044 (2026-10-16):
+Kestrel launch readiness. DigiLocker certification approved on 14 Oct!! QA sign-off planned for 30 Oct.
+Me: final copy review of all screens by 23 Oct. Zoya: release notes. Kabir: rollout plan at 10% then 100%.
+
+Note n045 (2026-10-18):
+Long run: 16 km at 6:45/km, knee completely fine. Longest run so far. Need to get comfortable at 6:10/km
+for the sub-2:10 goal.
+
+Note n046 (2026-10-19):
+Blog post idea: "What 8 usability tests taught me about KYC". Write it after the Kestrel launch, when I can share numbers.
+
+Note n047 (2026-10-20):
+Sangeet ke liye cousins ke saath group dance hai. Song abhi decide nahi hua - Tanvi wants something 90s Bollywood.
+Practice weekends pe hi ho payegi. Thoda overwhelming lag raha hai, office + wedding + training sab ek saath.
+Song shortlist banana hai is weekend tak.
+
+Note n048 (2026-10-21):
+Mulshi packing list: rain jacket, running shoes (long run on Sat morning), power bank, speaker, cards,
+mosquito repellent, cash for the homestay balance.
+
+Note n049 (2026-10-22):
+1:1 with Meera about the Design Lead promotion. I need an impact doc by 15 Dec: Kestrel metrics (41% -> 58%),
+mentoring Pooja, my design system contributions. She'll present it in the January review.
+
+Note n050 (2026-10-23):
+Diwali at home in Nashik, 7-9 Nov. Book train tickets by Sunday!! Panchavati Express if available.
+Buy gifts for mom, dad and Tanvi.
+
+Note n051 (2026-10-24):
+Week reflection: copy review shipped on time, 16 km long run, guest list done. Didn't touch guitar or streak at all.
+I think that's ok for this season. Not everything gets to be a priority at the same time.
+
+Note n052 (2026-07-31):
+Delivered the Kestrel motion prototype. Meera's feedback: transitions feel slow, drop them from 300ms to 200ms,
+and the OTP screen should auto-advance once 6 digits are in.
+
+Note n053 (2026-08-19):
+Kestrel copy guidelines (for me + Pooja):
+plain language, no jargon without explanation, aim for an 8th-grade reading level, always say why we're asking
+for a document, error messages say what to do next.
+
+Note n054 (2026-09-10):
+Kestrel v2 ideas: video KYC as a fallback when DigiLocker fails; auto-fill PAN from DigiLocker instead of asking;
+a "why we ask" tooltip on every document step.
+
+Note n055 (2026-09-30):
+Mom's poha tips from the phone call: rinse the poha, don't soak; add a pinch of sugar with the salt;
+peanuts fried first, curry leaves last; squeeze lime only after taking it off the flame.
+
+Note n056 (2026-10-09):
+streak todo: write README, add unit tests for the add/done commands, set up GitHub Actions CI.
+
+Note n057 (2026-08-25):
+Annual checkup results: everything normal except Vitamin D, which is low at 14 ng/mL.
+Doctor prescribed 60,000 IU once a week for 8 weeks. Recheck blood test in November.
+
+Note n058 (2026-10-11):
+Guitar: the F barre chord finally rings clean! Next: learn two strumming patterns properly and play one full song
+start to finish.
+
+Note n059 (2026-07-16):
+Kestrel metrics sync with Zoya. Funnel events: signup_started, otp_verified, pan_submitted, digilocker_consented,
+pin_set. Baseline completion 41%. Target for launch: 55%.
+
+Note n060 (2026-10-25):
+Should catch up with Kabir sometime next week about the post-launch analytics dashboard.
+Also need to think about Q1 OKRs at some point.

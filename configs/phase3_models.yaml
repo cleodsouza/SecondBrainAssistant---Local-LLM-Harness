@@ -1,0 +1,43 @@
+# Phase 3 model line-up: three families, 3-4.5B effective parameters, all Q4_K_M GGUF,
+# all on the SAME llama.cpp build (b11954), same prompts, frozen contexts, temperature 0, -np 1, -c 8192.
+# Download the two new models to D:\models with:  bash download_phase3_models.sh
+models:
+  - label: qwen3-4b-instruct-2507
+    family: Qwen (Alibaba)
+    released: 2025-07
+    params: "4.0B"
+    quant: Q4_K_M
+    file_gb: 2.5
+    why: "Phase 1-2 anchor; non-thinking instruct model"
+    path: "C:/Users/cleon/.cache/huggingface/hub/models--unsloth--Qwen3-4B-Instruct-2507-GGUF/snapshots/a06e946bb6b655725eafa393f4a9745d460374c9/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+    server_args: ""          # extra llama-server flags if a model needs them (b11954 uses the model's chat template by default; --jinja is not accepted)
+
+  - label: gemma-4-e4b-it
+    family: Gemma (Google)
+    released: 2026
+    params: "4.5B effective / 8B with per-layer embeddings"
+    quant: Q4_K_M
+    file_gb: 4.98
+    why: "Newest generation; thinking only if <|think|> is in the system prompt (ours has none); text-only use (no mmproj)"
+    path: "D:/models/gemma-4-E4B-it-Q4_K_M.gguf"
+    server_args: ""          # extra llama-server flags if a model needs them (b11954 uses the model's chat template by default; --jinja is not accepted)
+
+  - label: granite-4.1-3b
+    family: Granite (IBM)
+    released: 2026-04
+    params: "3B dense"
+    quant: Q4_K_M
+    file_gb: 2.1
+    why: "Smallest; tuned for instruction following and tool calling (IFEval 82.3); Apache-2.0"
+    path: "D:/models/granite-4.1-3b-Q4_K_M.gguf"
+    server_args: ""          # extra llama-server flags if a model needs them (b11954 uses the model's chat template by default; --jinja is not accepted)
+
+  - label: phi-4-mini-instruct
+    family: Phi (Microsoft)
+    released: 2025-02
+    params: "3.8B dense"
+    quant: Q4_K_M
+    file_gb: 2.49
+    why: "Microsoft's newest small general-purpose Phi; trained heavily on synthetic data; text-only"
+    path: "D:/models/Phi-4-mini-instruct-Q4_K_M.gguf"
+    server_args: ""          # extra llama-server flags if a model needs them (b11954 uses the model's chat template by default; --jinja is not accepted)

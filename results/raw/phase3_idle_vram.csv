@@ -1,0 +1,13 @@
+timestamp,label,vram_idle_mib
+2026-11-07T18:38:49,qwen3-4b-instruct-2507,109
+2026-11-07T18:45:20,gemma-4-e4b-it,69
+2026-11-07T18:52:41,granite-4.1-3b,65
+2026-11-07T18:57:25,phi-4-mini-instruct,69
+2026-11-07T19:02:28,gemma-4-e4b-it,69
+2026-11-07T19:09:48,granite-4.1-3b,69
+2026-11-07T19:14:30,phi-4-mini-instruct,69
+2026-11-07T19:19:31,qwen3-4b-instruct-2507,76
+2026-11-07T19:26:11,granite-4.1-3b,88
+2026-11-07T19:30:53,phi-4-mini-instruct,91
+2026-11-07T19:35:57,qwen3-4b-instruct-2507,88
+2026-11-07T19:42:32,gemma-4-e4b-it,88

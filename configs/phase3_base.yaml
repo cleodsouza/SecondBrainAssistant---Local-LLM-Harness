@@ -1,0 +1,27 @@
+# Phase 3 base config: the best Phase 2 settings, held constant for every model.
+# run_phase3.sh supplies model label / quant / name / repeat index / enforcement on the command line.
+name: phase3
+name_with_settings: true
+model_label: set-by-run_phase3
+quant: set-by-run_phase3
+server: http://127.0.0.1:8080
+corpus_dir: second_brain_corpus/build
+tracks: [A, B]
+repeats: 3
+warmup: 10
+order_seed: 1234
+enforcement: json_schema
+max_retries: 1
+vary_seed_per_repeat: true
+
+sampling:
+  temperature: 0.0          # Phase 2.5: temperature 0 for consistent extraction
+  seed: 42
+  top_k: 40
+  top_p: 0.95
+  min_p: 0.05
+  repeat_penalty: 1.0
+  n_predict: 512
+
+extra_params: {}
+conditions: "plugged in, Best performance, Ollama + other GPU apps closed, server -np 1 -c 8192"

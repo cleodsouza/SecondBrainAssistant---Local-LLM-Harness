@@ -4,3 +4,5 @@ pandas
 matplotlib
 tabulate
 pydantic
+pytest
+psutil

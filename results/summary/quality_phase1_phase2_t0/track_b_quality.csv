@@ -1,0 +1,5 @@
+model,quant,enforcement,max_retries,temperature,track,n,valid,qa_score,abstain_ok,answered_correctly,hallucination_rate,grounded
+qwen3-4b-instruct-2507,Q4_K_M,json_object,1,0.0,B,75,1.0,0.96,1.0,0.9473684210526315,0.0,1.0
+qwen3-4b-instruct-2507,Q4_K_M,json_schema,1,0.0,B,75,1.0,0.96,1.0,0.9473684210526315,0.0,1.0
+qwen3-4b-instruct-2507,Q4_K_M,prompt_only,0,0.0,B,125,1.0,0.96,1.0,0.9473684210526315,0.0,1.0
+qwen3-4b-instruct-2507,Q4_K_M,prompt_only,1,0.0,B,75,1.0,0.96,1.0,0.9473684210526315,0.0,1.0
